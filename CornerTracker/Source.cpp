@@ -4,6 +4,8 @@
 #include <Windows.h>
 #include <opencv2\opencv.hpp>
 
+#include <atltime.h>
+
 int main(int argc, char** argv)
 {
     cv::VideoCapture cap(0);
@@ -14,6 +16,9 @@ int main(int argc, char** argv)
     const int cycle = 30;
 
 	bool refresh = true;
+
+    CFileTime cTimeStart, cTimeEnd;
+    CFileTimeSpan cTimeSpan;
 
 
     cv::Mat prevFrame;
@@ -42,9 +47,14 @@ int main(int argc, char** argv)
         std::vector<float> featuresErrors;
 
 		if(refresh){
-			cv::goodFeaturesToTrack(currFrameGray, currCorners, 100, 0.01, 10.0);
-			cv::cornerSubPix(currFrameGray, currCorners, cv::Size(21, 21), cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.01));
+		    cTimeStart = CFileTime::GetCurrentTime();           // åªç›éûçè
+			cv::goodFeaturesToTrack(currFrameGray, currCorners, 200, 0.01, 50.0);
+			cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03));
+			cTimeEnd = CFileTime::GetCurrentTime();           // åªç›éûçè
+			cTimeSpan = cTimeEnd - cTimeStart;
+			std::cout<< "cv::goodFeaturesToTrack():" << cTimeSpan.GetTimeSpan()/10000 << "[ms]" << std::endl;
 		}else{
+		    cTimeStart = CFileTime::GetCurrentTime();           // åªç›éûçè
 			cv::calcOpticalFlowPyrLK(
 				prevFrameGray,
 				currFrameGray,
@@ -52,7 +62,10 @@ int main(int argc, char** argv)
 				currCorners,
 				featuresFound,
 				featuresErrors);
-			cv::cornerSubPix(currFrameGray, currCorners, cv::Size(21, 21), cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 30, 0.01));
+			cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03));
+			cTimeEnd = CFileTime::GetCurrentTime();           // åªç›éûçè
+			cTimeSpan = cTimeEnd - cTimeStart;
+			std::cout<< "cv::calcOpticalFlowPyrLK():" << cTimeSpan.GetTimeSpan()/10000 << "[ms]" << std::endl;
 		}
         for (int i = 0; i < currCorners.size(); i++) {
             cv::Point p2 = cv::Point((int) currCorners[i].x, (int) currCorners[i].y);
