@@ -7,6 +7,9 @@
 int main(int argc, char** argv)
 {
     cv::VideoCapture cap(0);
+	cap.set(CV_CAP_PROP_FRAME_WIDTH, 1920);
+	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 1080);
+	cap.set(CV_CAP_PROP_FPS, 30);
 
     const int cycle = 30;
 
@@ -65,7 +68,10 @@ int main(int argc, char** argv)
 			}
         }
 
-        cv::imshow("preview", drawframe);
+		//コーナー検出結果表示
+		cv::Mat resize_cam;
+		cv::resize(drawframe, resize_cam, cv::Size(), 0.8, 0.8);
+		cv::imshow("preview", resize_cam);
         prevFrame = frame;
 		prevCorners = currCorners;
 
