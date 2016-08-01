@@ -41,7 +41,7 @@ int main(int argc, char** argv)
         cv::cvtColor(frame, currFrameGray, CV_RGB2GRAY);
 
         // 特徴点抽出
-        std::vector<cv::Point2f> currCorners;
+        std::vector<cv::Point2f> currCorners; //->whileの外に出してみる
 
         std::vector<uchar> featuresFound;
         std::vector<float> featuresErrors;
@@ -49,7 +49,8 @@ int main(int argc, char** argv)
 		if(refresh){
 		    cTimeStart = CFileTime::GetCurrentTime();           // 現在時刻
 			cv::goodFeaturesToTrack(currFrameGray, currCorners, 200, 0.01, 50.0);
-			cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03));
+			//cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03));
+			cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03));
 			cTimeEnd = CFileTime::GetCurrentTime();           // 現在時刻
 			cTimeSpan = cTimeEnd - cTimeStart;
 			std::cout<< "cv::goodFeaturesToTrack():" << cTimeSpan.GetTimeSpan()/10000 << "[ms]" << std::endl;
