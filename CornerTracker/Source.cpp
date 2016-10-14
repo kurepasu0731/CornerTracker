@@ -7,6 +7,9 @@
 #include <atltime.h>
 
 #define A_THRESH_VAL -5
+#define DOT_THRESH_VAL_MIN 10  // ドットノイズ弾き
+#define DOT_THRESH_VAL_MAX 15 // エッジノイズ弾き
+
 
 int main(int argc, char** argv)
 {
@@ -42,6 +45,8 @@ int main(int argc, char** argv)
         cv::cvtColor(prevFrame, prevFrameGray, CV_RGB2GRAY);
         cv::cvtColor(frame, currFrameGray, CV_BGR2GRAY);
 
+//適応的閾値処理のテスト
+#if 0
 		//適応的閾値処理の確認//
 		cv::Mat adapBinImg, binImg;
 		cv::adaptiveThreshold(currFrameGray, adapBinImg, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 7, A_THRESH_VAL);
@@ -55,9 +60,10 @@ int main(int argc, char** argv)
 		cv::imshow("adaptiveThreshold", resizeAdap);
 		int key = cv::waitKey(cycle);
 		//適応的閾値処理の確認//
+#endif
 
-
-#if 0
+//コーナー点の検出とトラッキング
+#if 1
         // 特徴点抽出
         std::vector<cv::Point2f> currCorners; //->whileの外に出してみる
 
