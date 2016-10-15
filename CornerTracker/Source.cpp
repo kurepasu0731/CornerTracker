@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 1080);
 	cap.set(CV_CAP_PROP_FPS, 30);
 
-    const int cycle = 30;
+    const int cycle = 10;
 
 	bool refresh = true;
 
@@ -30,6 +30,8 @@ int main(int argc, char** argv)
     cv::waitKey(cycle);
 
     while (1) {
+		cTimeStart = CFileTime::GetCurrentTime();           // 現在時刻
+
         cv::Mat frame;
         cap >> frame;
 		cv::Mat drawframe = frame.clone();
@@ -47,13 +49,13 @@ int main(int argc, char** argv)
         std::vector<float> featuresErrors;
 
 		if(refresh){
-		    cTimeStart = CFileTime::GetCurrentTime();           // 現在時刻
+		    //cTimeStart = CFileTime::GetCurrentTime();           // 現在時刻
 			cv::goodFeaturesToTrack(currFrameGray, currCorners, 200, 0.01, 50.0);
-			//cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03));
-			cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03));
-			cTimeEnd = CFileTime::GetCurrentTime();           // 現在時刻
-			cTimeSpan = cTimeEnd - cTimeStart;
-			std::cout<< "cv::goodFeaturesToTrack():" << cTimeSpan.GetTimeSpan()/10000 << "[ms]" << std::endl;
+			cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03));
+			//cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03));
+			//cTimeEnd = CFileTime::GetCurrentTime();           // 現在時刻
+			//cTimeSpan = cTimeEnd - cTimeStart;
+			//std::cout<< "cv::goodFeaturesToTrack():" << cTimeSpan.GetTimeSpan()/10000 << "[ms]" << std::endl;
 		}else{
 		    cTimeStart = CFileTime::GetCurrentTime();           // 現在時刻
 			cv::calcOpticalFlowPyrLK(
@@ -71,8 +73,8 @@ int main(int argc, char** argv)
         for (int i = 0; i < currCorners.size(); i++) {
             cv::Point p2 = cv::Point((int) currCorners[i].x, (int) currCorners[i].y);
 			if(refresh)	{
-				cv::putText(drawframe,std::to_string(i), cv::Point((int) currCorners[i].x, (int) currCorners[i].y), cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(0,0,255));
-				cv::circle(drawframe, p2, 3, cv::Scalar(0,0,255), 2);
+				//cv::putText(drawframe,std::to_string(i), cv::Point((int) currCorners[i].x, (int) currCorners[i].y), cv::FONT_HERSHEY_SIMPLEX, 0.7, cv::Scalar(0,0,255));
+				cv::circle(drawframe, p2, 1, cv::Scalar(0,0,255), 2);
 			}else{
 				if(featuresErrors[i] <= 30.0f) //画面外に飛び出てる
 				{
@@ -84,7 +86,7 @@ int main(int argc, char** argv)
 
 		//コーナー検出結果表示
 		cv::Mat resize_cam;
-		cv::resize(drawframe, resize_cam, cv::Size(), 0.8, 0.8);
+		cv::resize(drawframe, resize_cam, cv::Size(), 0.5, 0.5);
 		cv::imshow("preview", resize_cam);
         prevFrame = frame;
 		prevCorners = currCorners;
@@ -95,6 +97,11 @@ int main(int argc, char** argv)
 		else if(key == 32){
 			refresh = !refresh;
 		}
+
+		cTimeEnd = CFileTime::GetCurrentTime();           // 現在時刻
+		cTimeSpan = cTimeEnd - cTimeStart;
+		std::cout<< cTimeSpan.GetTimeSpan()/10000 << "[ms]" << std::endl;
+
     }
     return 0;
 }
