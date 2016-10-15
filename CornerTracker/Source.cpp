@@ -14,8 +14,8 @@
 int main(int argc, char** argv)
 {
     cv::VideoCapture cap(0);
-	cap.set(CV_CAP_PROP_FRAME_WIDTH, 1280);
-	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 720);
+	cap.set(CV_CAP_PROP_FRAME_WIDTH, 1920);
+	cap.set(CV_CAP_PROP_FRAME_HEIGHT, 1080);
 	cap.set(CV_CAP_PROP_FPS, 30);
 
     const int cycle = 10;
@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 		if(refresh){
 		    //cTimeStart = CFileTime::GetCurrentTime();           // 現在時刻
 			cv::goodFeaturesToTrack(currFrameGray, currCorners, 200, 0.01, 50.0);
-			cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03));
+			cv::cornerSubPix(currFrameGray, currCorners, cv::Size(11, 11), cv::Size(-1, -1), cv::TermCriteria(cv::TermCriteria::COUNT | cv::TermCriteria::EPS, 20, 0.03));
 			//cv::cornerSubPix(currFrameGray, currCorners, cv::Size(3, 3), cv::Size(-1, -1), cv::TermCriteria(CV_TERMCRIT_ITER | CV_TERMCRIT_EPS, 20, 0.03));
 			//cTimeEnd = CFileTime::GetCurrentTime();           // 現在時刻
 			//cTimeSpan = cTimeEnd - cTimeStart;
@@ -110,8 +110,8 @@ int main(int argc, char** argv)
 
 		//コーナー検出結果表示
 		cv::Mat resize_cam;
-		cv::resize(drawframe, resize_cam, cv::Size(), 0.5, 0.5);
-		cv::imshow("preview", resize_cam);
+		//cv::resize(drawframe, resize_cam, cv::Size(), 0.8, 0.8);
+		cv::imshow("preview", drawframe);
         prevFrame = frame;
 		prevCorners = currCorners;
 
@@ -158,12 +158,11 @@ int main(int argc, char** argv)
         prevFrame = frame;
         if (cv::waitKey(cycle) == 27) { break; }
 #endif
-	}
-
 		cTimeEnd = CFileTime::GetCurrentTime();           // 現在時刻
 		cTimeSpan = cTimeEnd - cTimeStart;
 		std::cout<< cTimeSpan.GetTimeSpan()/10000 << "[ms]" << std::endl;
+	}
 
-    }
+
     return 0;
 }
